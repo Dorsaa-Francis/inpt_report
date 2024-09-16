@@ -8,8 +8,7 @@
 
 ### Submitted by:
 <p>Francis Dorsaa</p>
-<p>Index Number: </p>
-<p>Student number: </p>
+
 
 # Table of Contents
 1. [Summary](#summary)
