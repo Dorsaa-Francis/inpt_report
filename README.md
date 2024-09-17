@@ -15,244 +15,158 @@
 6. [Web-Based_Attack_Surfaces](#Web-BasedAttackSurfaces)
 
 
-# Summary
-An Internal Network Penetration Test was conducted on the network range 10.10.10.0/24 and the domain https://virtualinfosecafrica.com/ between September 12th and September 14th, 2024. This report details the findings from the penetration test, which captures the network security status of the specified scope at that particular moment. Further information can be found in the following sections.
+### Summary
+An Internal Network Penetration Test was performed on a scope comprising 10.10.10.0/24 and a domain name https://virtualinfosecafrica.com/ from September 12th, 2024 to September 14th, 2024. This report describes penetration testing that represents a point in time snapshots of the network security posture of the scope in question which can be found in the subsequent sessions.
 
-# Testing_Methodogy
-The testing began with the use of the Network Mapper (NMAP) tool to identify active hosts and services within the provided IP address range. The results from this tool were then reviewed manually, with hosts and services being individually enumerated to identify any potential vulnerabilities or weaknesses that may have been overlooked. Additionally, web-based attack surfaces were exploited to create and deploy payloads.
 
-# Host Discovery
-Host discovery involves identifying active devices on a network. This process helps to refine the scope of a network assessment or security testing. One of the most commonly used tools for host discovery is Nmap.
+### Testing Methodogy
+Testing took off by utilizing the Network Mapper(NMAP) tool to locate live hosts and services in the in-scope ip address provided. The output of this tooling was then manually examined and the host and services were manually enumerated to uncover any missed vulnerability and weakness. Web-based attack surfaces were exploited to generate payloads.
 
-Nmap is an open-source command-line tool that uses ICMP, echo requests, TCP, and UDP packets to detect active hosts on a network.
 
-When using Nmap, various options or arguments are available for host discovery, depending on the specific objectives. Some of these include:
-- `-sL`: List scan (Simply lists the targets to be scanned)
-- `-sN`: Ping scan (Disables port scanning)
-- `-Pn`: Treats all hosts as online (Skips host discovery)
+### Host Discovery
+Host discovery is a process of finding live hosts on a network. It can be used to narrow down the scope of a network assessment or during security testing. One tool which is mostly used in host discovery is the nmap tool. The command used in the host discovery was " nmap -sn 10.10.10.0/24 ", where " -sn (or --ping-scan) " - tells nmap to perform a "ping scan" which is used to discover hosts without performing a full port scan. It will only check if hosts are alive, not what services they are running.
+" 10.10.10.0/24 " - specifies the target network. The /24 is a CIDR notation indicating a subnet mask of 255.255.255.0, which means the scan will cover all IP addresses from 10.10.10.1 to 10.10.10.254.
 
-For our scan report, we used the `-sn` argument. The command executed was `nmap -sn 10.10.10.0/24`. Here, `-sn` (or `--ping-scan`) directs Nmap to perform a ping scan, which identifies live hosts without conducting a full port scan. This method only verifies if hosts are active, without detailing the services they are running. The `10.10.10.0/24` specifies the target network, with `/24` representing a subnet mask of 255.255.255.0. This means the scan covers all IP addresses from 10.10.10.1 to 10.10.10.254.
+![Host Discovery](Images/host_discovery.png)
 
-![Example Image](Images/ping_scan.png)
+The below image is a description of how subdomain enumeration was performed using aiodnsbrute tool
+![Aiodnsbrute](Images/aiodns.png)
 
-#### For -sL scan
 
-![List_scan](Images/list_scan.png)
 
-#### For -Pn scan
+### Service Discovery And Port Scanning
+Service discovery and port scanning are essential techniques in network management, security, and administration.
 
-![Bypass_scan](Images/Bypass_online.png)
+##### Service Discovery
+- **Purpose:** Identifies active services on a network, such as web servers or databases.
+- **Benefits:**
+  - **Configuration Management:** Helps administrators verify and manage service configurations.
+  - **Troubleshooting:** Assists in diagnosing and resolving network issues by revealing which services are running.
+  - **Security:** Aids in identifying potential vulnerabilities by showing what services are exposed and their current state.
 
-The output from the Nmap command provides details about active hosts. To filter and extract only the lines that indicate which hosts are online, you can use tools like grep and awk. The command to achieve this is:
+##### Port Scanning
+- **Purpose:** Detects open ports on networked devices, revealing which services are available.
+- **Benefits:**
+  - **Network Mapping:** Helps in understanding the network layout and available services.
+  - **Security Assessment:** Identifies open ports and services that may be vulnerable, aiding in vulnerability management.
+  - **Compliance:** Ensures systems meet security policies and standards by regularly checking for unintended open ports.
 
-nmap -sn 10.10.10.0/24 | grep "Nmap scan report for" | awk '{print $5}'
+##### Combined Use
+- **Enhanced Security:** Together, these techniques provide a comprehensive view of network security, identifying vulnerabilities and ensuring proper configuration.
+- **Efficient Management:** They help in maintaining a secure and well-managed network environment by detecting potential issues early.
+  
+![Service Discovery and Port Scanning](Images/sdps.png)
 
-This command works as follows:
 
-grep "Nmap scan report for" filters the output to include only lines that contain the phrase "Nmap scan report for," which indicates an active host.
-awk '{print $5}' extracts and displays the fifth field from these lines, which corresponds to the IP addresses of the hosts that are up.
+### Vulnerability Scanning
+Vulnerability scanning is an automated process that identifies security weaknesses in systems, networks, or applications. It helps detect unpatched software, misconfigurations, and other vulnerabilities that could be exploited. The scanning process involves discovering live hosts, scanning for known issues, analyzing results, and generating reports. 
 
-![PSG](Images/ping_scan_grep.png)
+- The image below shows how a custom wordlist can be created using cewl and also procedure used during the vulnerability scanning:
 
-This command sequence utilizes `grep` to identify lines indicating that a host is online and `awk` to extract and print only the IP addresses of those hosts.
+![Vulnerability Scanning](Images/vulnerability_scanning.png)
 
-To save the results to a file, you can redirect the output of the command to a file. For example:
+---
 
-nmap -sn 10.10.10.0/24 | grep "Nmap scan report for" | awk '{print $5}' > hosts_up.txt
-
-This command will save the IP addresses of the active hosts into a file named `hosts_up.txt`.
-
-![Host_up](Images/host_up.png)
-
-This command will create (or overwrite) a file named `hosts_up.txt` containing the list of IP addresses for active hosts.
-
-To verify that the file has been correctly written, you can use the following command to view its contents:
-
-cat hosts_up.txt
-
-For subdomain enumeration, you can use the `aiodnsbrute` tool. To enumerate subdomains for `https://virtualinfosecafrica.com` using a wordlist located at `/usr/share/wordlists/rockyou.txt`, use the following command:
-
-aiodnsbrute -d virtualinfosecafrica.com -w /usr/share/wordlists/rockyou.txt > subdomains.txt
-
-This command will output the discovered subdomains into a file named `subdomains.txt`.
-
-# Sevice Discovery and Port Scanning
-Service discovery, or port scanning, involves actively probing a target network to identify open ports and the services running on them. This process maps out the applications and potential vulnerabilities exposed by checking which ports are actively listening for connections, thereby providing crucial information for further penetration testing.
-
-Service discovery and port scanning are key aspects of network security assessments, penetration testing, and overall network management. Understanding which services are active and which ports are open is vital for evaluating a system's security posture. Unsecured or outdated services can be exploited if not properly managed.
-
-Certain services may have known vulnerabilities. Identifying these services allows you to apply relevant security patches or adjustments. Additionally, ensuring that only authorized services are running is often necessary for compliance with security standards and regulations.
-
-To conduct a service discovery scan and save the results in a greppable Nmap format, use the following command:
-
-nmap -sV -oG nmap_services.txt 10.10.10.0/24
-
-![nmap_oG](Images/nmap_oG.png)
-
-After obtaining the Nmap results in greppable format, you can filter the results by protocol using `grep`.
-
-To extract TCP services from the results, use the following command:
-
-grep "/tcp" nmap_services.txt > tcp_services_separated.txt
-
-This command searches for lines containing "/tcp" in the `nmap_services.txt` file and saves the filtered results to `tcp_services_separated.txt`.
-
-![grep_tcp](Images/grep_tcp.png)
-
-# Vulnerabilities
-Vulnerabilities are scan using metasploit by first running metasploit console
-
-In the Metasploit console, we use the db_import command to import the results.
-
-db_import /path/to/nmap_results.xml
-
-we now search for available auxiliary modules in Metasploit that can scan for vulnerabilities based on nmap results, we use:
-
-search type:auxiliary using:
-
-use auxiliary/scanner/mysql/mysql_login,
-
-use auxiliary/scanner/vnc/vnc_login
-
-use auxiliary/scanner/rdp/rdp_login
-
-use auxiliary/scanner/smb/smb_login
-
-we can scan for vulnerabilities To use protocol-specific file created, we can use it with scanning tools in Metasploit.
-
-First we launch msfconsole;
-
-msfconsole
-msconf
-
-Then select an Auxiliary Module:
-
-For example, if you want to scan mysql services for vulnerabilities:
-
-use auxiliary/scanner/mysql/mysql_login
-mysql
-
-Set the RHOSTS Option:
-
-Point RHOSTS to the protocol-specific file:
-
-set RHOSTS file:/path/to/protocol_specific_file.txt
-RHOSTS_file
-
-Run the Scan:
-
-run
-We can develop a custom wordlist by using cewl.
-
-CeWL (Custom Word List generator) is a tool that can be used to create a custom wordlist by crawling a website. This is particularly useful for tasks such as password cracking or fuzzing where a tailored wordlist might be more effective than a generic one. Here’s how you can use CeWL to generate a custom wordlist and describe scenarios where it would be useful.
-
-To generate a wordlist using CeWL, the target URL is specified and various parameters are optionally configured to customize the output.
-
-Using the command line;
-
-cewl http://virtualinfosecafrica.com -w custom_wordlist.txt
-Once the wordlist is generated, it can be reviewed to ensure it contains the desired entries by using;
-
-cat custom_wordlist.txt
-The wordlist file will be a plain text file with one word per line.
 
 #### Summary of Findings
-
-| Finding      | Severity     |
-|--------------|--------------|
-| Unauthenticated Remote Code Execution (RCE) | Critical |
-| Denial of service (DoS) | Moderate |
-| UltraVNC DSM Plugin Local Privilege Escalation | High |
-| Apache Tomcat AJP File Read/Inclusion | Critical |
+| Finding                                        | Severity |
+|------------------------------------------------|----------|
+| Unauthenticated Remote Code Execution (RCE) | Critical    |
+| Denial of service (DoS)                          | Moderate     |
+|UltraVNC DSM Plugin Local Privilege Escalation                   | High     |
+| Apache Tomcat AJP File Read/Inclusion |Critical  |
 
 #### Detailed Findings
-Unauthenticated Remote Code Execution (RCE)
+#### Unauthenticated Remote Code Execution (RCE)
 
-| Current Rating | CVSS Score |
-|----------------|------------|
-| Critical | 9.8 |
+| *Current Rating:* | CVSS Score   |
+|-------------------|--------------|
+|Critical           |   9.8         |
 
 #### Evidence
-This module exploits an unauthenticated Remote Code Execution (RCE) vulnerability present in Apache version 2.4.49 (CVE-2021-41773). If the ‘require all denied’ directive does not restrict files outside the document root and CGI is enabled, it allows for arbitrary command execution. This issue was reintroduced in the update for Apache 2.4.50 (CVE-2021-42013).
+This module exploit an unauthenticated RCE vulnerability which 
+  exists in Apache version 2.4.49 (CVE-2021-41773). If files outside 
+  of the document root are not protected by ‘require all denied’ 
+  and CGI has been explicitly enabled, it can be used to execute 
+  arbitrary commands (Remote Command Execution). This vulnerability 
+  has been reintroduced in Apache 2.4.50 fix (CVE-2021-42013).
 
-#### Affected Resources
-  '10.10.10.2, 10.10.10.30, 10.10.10.45, 10.10.10.55'
+  - Output after using metaploit auxilliary module
+    ![metasploit 1](Images/metasploit1.png)
 
-#### Recommendations
-  Upgrade to a patched version of the Apache HTTP Server to resolve this vulnerability.
-  
+    ![metasploit 2](Images/metasploit2.png)
+
+ #### Affected Resources are;
+      '10.10.10.2, 10.10.10.30, 10.10.10.45, 10.10.10.55'
+
+ #### Recommendations
+      Update to a newer patched version of Apache HTTP Server.
+
+---
 ### Denial of service (DoS)
 
-| Current Rating | CVSS Score |
-|----------------|------------|
-| Medium | 6.5 |
+| *Current Rating:* | CVSS Score   |
+|-------------------|--------------|
+|Medium          |   6.5         |
 
-These are the vulnerabilities associated with the service version MySQL 5.6.49  with the port 3306
+These are the vulnerabilities associated with the service version  `MySQL 5.6.49 ` with the port `3306`
 
 #### Evidence
+CVE-2020-14765: This vulnerability exists in the FTS component of MySQL Server. It allows a low-privileged attacker with network access to cause a denial of service (DoS) by causing the MySQL Server to hang or crash. The CVSS 3.1 Base Score for this vulnerability is 6.5, indicating a medium level of severity, primarily affecting availability.
 
-**CVE-2020-14765:** This vulnerability affects the Full-Text Search (FTS) component of MySQL Server. It allows a low-privileged attacker with network access to trigger a denial of service (DoS) by causing the MySQL Server to hang or crash. This vulnerability has a CVSS 3.1 Base Score of 6.5, indicating medium severity, with a primary impact on server availability.
+CVE-2020-14769: Found in the Optimizer component of MySQL Server, this vulnerability also allows a low-privileged attacker with network access to potentially cause a hang or crash, leading to a complete DoS of the MySQL Server. This issue also has a CVSS 3.1 Base Score of 6.5, indicating medium severity with an impact on availability.
 
-**CVE-2020-14769:** This issue is located in the Optimizer component of MySQL Server. It similarly permits a low-privileged attacker with network access to potentially cause the server to hang or crash, resulting in a complete DoS. The CVSS 3.1 Base Score for this vulnerability is also 6.5, reflecting medium severity with an emphasis on availability.
+![msql1](Images/msql1.png)
+
+![msql2](Images/msql2.png)
+
 
 #### Affected Resources:
-10.10.10.5, 10.10.10.40
+`10.10.10.5 , 10.10.10.40`
 
 #### Recommendations
+* Rate Limiting: Implement rate limiting to control the number of requests a user can make to a service in a given timeframe. This can help mitigate the impact of DoS attacks by limiting the number of requests that can overwhelm the system.
 
-- **Rate Limiting:** Implement rate limiting to control the number of requests a user can make to a service within a given period. This can help mitigate the impact of DoS attacks by preventing the system from being overwhelmed by excessive requests.
+* Traffic Filtering and Shaping: Use firewalls and intrusion prevention systems (IPS) to filter out malicious traffic. Traffic shaping can prioritize legitimate traffic and limit the impact of the attack.
 
-- **Traffic Filtering and Shaping:** Use firewalls and intrusion prevention systems (IPS) to filter out malicious traffic. Additionally, apply traffic shaping to prioritize legitimate traffic, which can reduce the effects of an attack.
+* Load Balancing: Distribute incoming traffic across multiple servers or resources. This can help prevent any single server from being overwhelmed and ensure continuity of service.
 
-- **Load Balancing:** Distribute incoming traffic across multiple servers or resources. This approach helps prevent any single server from becoming overloaded, thus ensuring ongoing service availability and stability.
-- 
+
+---
 ### UltraVNC DSM Plugin Local Privilege Escalation Vulnerability
+| *Current Rating:* | CVSS Score   |
+|-------------------|--------------|
+|  High           |     7.8      |
 
-| Current Rating | CVSS Score |
-|----------------|------------|
-| High | 7.8 |
-
-It was found that the affected resources are running an outdated version of UltraVNC, specifically version 1.2.1.7, which contains vulnerabilities that can be exploited.
+It was discovered that the service version for the affected resourses which is UltraVNC 1.2.1.7 is the old version which contain vulnerabilities which could be exploited.
 
 #### Evidence
+CVE-2022-24750	UltraVNC is a free and open source remote pc access software. A vulnerability has been found in versions prior to 1.3.8.0 in which the DSM plugin module, which allows a local authenticated user to achieve local privilege escalation (LPE) on a vulnerable system. The vulnerability has been fixed to allow loading of plugins from the installed directory. Affected users should upgrade their UltraVNC to 1.3.8.1. Users unable to upgrade should not install and run UltraVNC server as a service. It is advisable to create a scheduled task on a low privilege account to launch WinVNC.exe instead. There are no known workarounds if winvnc needs to be started as a service.
 
-**CVE-2022-24750:** UltraVNC, a free and open-source remote PC access software, has a vulnerability in versions earlier than 1.3.8.0. This issue affects the DSM plugin module and allows a local authenticated user to escalate privileges (Local Privilege Escalation, LPE) on a compromised system. The problem has been resolved in version 1.3.8.1, which includes a fix that limits plugin loading to the installed directory.
+![VNC 1](Images/vnc1.png)
 
-It is recommended to upgrade to UltraVNC version 1.3.8.1 to address this vulnerability. If upgrading is not possible, it is advised not to install or run the UltraVNC server as a service. Instead, users should configure a scheduled task with a low-privilege account to start WinVNC.exe. There are no known workarounds for cases where WinVNC must run as a service.
+![VNC 2](Images/vnc2.png)
 
-#### Affected Resources:
-10.10.10.50
+
+#### Affected resouces:
+`10.10.10.50`
 
 #### Recommendation
-Upgrade to the latest version, ideally UltraVNC 1.5.0.0, to ensure protection against this vulnerability.
+Upgrade to the latest version preferably version UltraVNC 1.5.0.0
 
-### Apache Tomcat AJP File Read/Inclusion
-| Current Rating | CVSS Score |
-|----------------|------------|
-| Critical |	9.8 |
+---
 
-Allows attackers to read or include files from the server via the AJP (Apache JServ Protocol) connector, which can lead to information disclosure and potentially remote code execution (RCE). Attackers can exploit this by sending specially crafted AJP messages to the server. Tools such as ajpycat can be used for this purpose.
+###  Apache Tomcat AJP File Read/Inclusion
 
-**Evidence**
+| *Current Rating:* | CVSS Score   |
+|-------------------|--------------|
+|  Critical        |        9.8  |
 
-**Ghostcat - CVE-2020-193:** This vulnerability occurs when Apache Tomcat is configured to trust AJP (Apache JServ Protocol) connections more than HTTP connections. In versions of Apache Tomcat from 9.0.0.M1 to 9.0.0.30, 8.5.0 to 8.5.50, and 7.0.0 to 7.0.99, the AJP Connector was enabled by default and accepted connections on all configured IP addresses. The security guide recommended disabling this connector if it was not necessary.
+Allows attackers to read or include files from the server using the AJP connector, leading to information disclosure and possible RCE. Attackers send crafted AJP messages to the server. Tools like `ajpycat` can exploit this.
 
-The vulnerability allowed:
-- Retrieval of arbitrary files from anywhere within the web application.
-- Execution of any file in the web application as a JSP.
+#### Evidence
+`Ghostcat` - CVE-2020-193: When using the Apache JServ Protocol (AJP), care must be taken when trusting incoming connections to Apache Tomcat. Tomcat treats AJP connections as having higher trust than, for example, a similar HTTP connection. If such connections are available to an attacker, they can be exploited in ways that may be surprising. In Apache Tomcat 9.0.0.M1 to 9.0.0.30, 8.5.0 to 8.5.50 and 7.0.0 to 7.0.99, Tomcat shipped with an AJP Connector enabled by default that listened on all configured IP addresses. It was expected (and recommended in the security guide) that this Connector would be disabled if not required. This vulnerability report identified a mechanism that allowed: - returning arbitrary files from anywhere in the web application - processing any file in the web application as a JSP Further, if the web application allowed file upload and stored those files within the web application (or the attacker was able to control the content of the web application by some other means) then this, along with the ability to process a file as a JSP, made remote code execution possible. It is important to note that mitigation is only required if an AJP port is accessible to untrusted users. Users wishing to take a defence-in-depth approach and block the vector that permits returning arbitrary files and execution as JSP may upgrade to Apache Tomcat 9.0.31, 8.5.51 or 7.0.100 or later. A number of changes were made to the default AJP Connector configuration in 9.0.31 to harden the default configuration. It is likely that users upgrading to 9.0.31, 8.5.51 or 7.0.100 or later will need to make small changes to their configurations.
 
-If the web application allowed file uploads and stored these files (or if an attacker could manipulate the content of the web application), this combined with the ability to process files as JSPs, enabled remote code execution.
-
-**Mitigation Recommendations:**
-- Ensure that an AJP port is not accessible to untrusted users to mitigate the risk.
-- For additional security, upgrade to Apache Tomcat versions 9.0.31, 8.5.51, or 7.0.100 or later. These versions have more secure default settings for the AJP Connector.
-- After upgrading, you may need to adjust your configurations to comply with the new default settings.
-
-![msconf](Images/msconf.png)
-
-![searchtype](Images/searchtype.png)
-
-![aux](Images/auxiliary.png)
 
 
 ### Web-Based Attack Surfaces
