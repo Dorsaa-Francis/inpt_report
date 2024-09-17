@@ -99,7 +99,7 @@ This command searches for lines containing "/tcp" in the `nmap_services.txt` fil
 
 ![grep_tcp](Images/grep_tcp.png)
 
-
+# Vulnerabilities
 Vulnerabilities are scan using metasploit by first running metasploit console
 
 In the Metasploit console, we use the db_import command to import the results.
