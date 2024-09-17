@@ -214,3 +214,16 @@ These commands will help you create the necessary payloads for your penetration 
 
 
 ![web attack](Images/was2.png)
+
+
+
+---
+
+## CVSS v3.0 Reference Table
+| Qualitative Rating | CVSS Score   |
+|--------------------|--------------|
+| None/Informational | N/A          |
+| Low                | 0.1 – 3.9    |
+| Medium             | 4.0 – 6.9    |
+| High               | 7.0 – 8.9    |
+| Critical           | 9.0 – 10.0   |
