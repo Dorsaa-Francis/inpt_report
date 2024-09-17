@@ -156,7 +156,7 @@ Once the wordlist is generated, it can be reviewed to ensure it contains the des
 cat custom_wordlist.txt
 The wordlist file will be a plain text file with one word per line.
 
-Summary of Findings
+#### Summary of Findings
 
 | Finding      | Severity     |
 |--------------|--------------|
@@ -172,13 +172,14 @@ Unauthenticated Remote Code Execution (RCE)
 |----------------|------------|
 | Critical | 9.8 |
 
-Evidence
-This module takes advantage of an unauthenticated Remote Code Execution (RCE) vulnerability found in Apache version 2.4.49 (CVE-2021-41773). If files located outside the document root are not restricted by the ‘require all denied’ directive and CGI is enabled, it can allow for the execution of arbitrary commands. This issue was reintroduced in the fix for Apache 2.4.50 (CVE-2021-42013).
+#### Evidence
+This module exploits an unauthenticated Remote Code Execution (RCE) vulnerability present in Apache version 2.4.49 (CVE-2021-41773). If the ‘require all denied’ directive does not restrict files outside the document root and CGI is enabled, it allows for arbitrary command execution. This issue was reintroduced in the update for Apache 2.4.50 (CVE-2021-42013).
 
-#### Affected Resources are;
+#### Affected Resources
   '10.10.10.2, 10.10.10.30, 10.10.10.45, 10.10.10.55'
+
 #### Recommendations
-  Update to a newer patched version of Apache HTTP Server.
+  Upgrade to a patched version of the Apache HTTP Server to resolve this vulnerability.
   
 ### Denial of service (DoS)
 
@@ -189,20 +190,21 @@ This module takes advantage of an unauthenticated Remote Code Execution (RCE) vu
 These are the vulnerabilities associated with the service version MySQL 5.6.49  with the port 3306
 
 #### Evidence
-**CVE-2020-14765:** This vulnerability is present in the FTS (Full-Text Search) component of MySQL Server. It enables a low-privileged attacker with network access to induce a denial of service (DoS) by causing the MySQL Server to either hang or crash. With a CVSS 3.1 Base Score of 6.5, this vulnerability is classified as having medium severity, primarily affecting the server's availability.
 
-**CVE-2020-14769:** This issue is found in the Optimizer component of MySQL Server. It similarly allows a low-privileged attacker with network access to potentially cause the server to hang or crash, leading to a complete DoS. The CVSS 3.1 Base Score for this vulnerability is also 6.5, reflecting medium severity with a focus on availability impacts.
+**CVE-2020-14765:** This vulnerability affects the Full-Text Search (FTS) component of MySQL Server. It allows a low-privileged attacker with network access to trigger a denial of service (DoS) by causing the MySQL Server to hang or crash. This vulnerability has a CVSS 3.1 Base Score of 6.5, indicating medium severity, with a primary impact on server availability.
+
+**CVE-2020-14769:** This issue is located in the Optimizer component of MySQL Server. It similarly permits a low-privileged attacker with network access to potentially cause the server to hang or crash, resulting in a complete DoS. The CVSS 3.1 Base Score for this vulnerability is also 6.5, reflecting medium severity with an emphasis on availability.
 
 #### Affected Resources:
-10.10.10.5 , 10.10.10.40
+10.10.10.5, 10.10.10.40
 
 #### Recommendations
 
-- **Rate Limiting:** Enforce rate limiting to manage the number of requests a user can send to a service within a specific timeframe. This approach helps reduce the impact of denial-of-service (DoS) attacks by capping the number of requests that can potentially overload the system.
+- **Rate Limiting:** Implement rate limiting to control the number of requests a user can make to a service within a given period. This can help mitigate the impact of DoS attacks by preventing the system from being overwhelmed by excessive requests.
 
-- **Traffic Filtering and Shaping:** Deploy firewalls and intrusion prevention systems (IPS) to block malicious traffic. Additionally, implement traffic shaping to prioritize legitimate requests, which can help mitigate the effects of an attack.
+- **Traffic Filtering and Shaping:** Use firewalls and intrusion prevention systems (IPS) to filter out malicious traffic. Additionally, apply traffic shaping to prioritize legitimate traffic, which can reduce the effects of an attack.
 
-- **Load Balancing:** Spread incoming traffic across multiple servers or resources. This strategy helps prevent any single server from being overwhelmed, thus maintaining service availability and continuity.
+- **Load Balancing:** Distribute incoming traffic across multiple servers or resources. This approach helps prevent any single server from becoming overloaded, thus ensuring ongoing service availability and stability.
 - 
 ### UltraVNC DSM Plugin Local Privilege Escalation Vulnerability
 
@@ -210,19 +212,19 @@ These are the vulnerabilities associated with the service version MySQL 5.6.49  
 |----------------|------------|
 | High | 7.8 |
 
-It was discovered that the service version for the affected resourses which is UltraVNC 1.2.1.7 is the old version which contain vulnerabilities which could be exploited.
+It was found that the affected resources are running an outdated version of UltraVNC, specifically version 1.2.1.7, which contains vulnerabilities that can be exploited.
 
 #### Evidence
 
-**CVE-2022-24750:** UltraVNC, a free and open-source remote PC access software, contains a vulnerability in versions prior to 1.3.8.0. This issue affects the DSM plugin module and allows a local authenticated user to escalate privileges locally (Local Privilege Escalation, LPE) on a compromised system. The vulnerability has been addressed in version 1.3.8.1, which includes a fix to restrict plugin loading to the installed directory. 
+**CVE-2022-24750:** UltraVNC, a free and open-source remote PC access software, has a vulnerability in versions earlier than 1.3.8.0. This issue affects the DSM plugin module and allows a local authenticated user to escalate privileges (Local Privilege Escalation, LPE) on a compromised system. The problem has been resolved in version 1.3.8.1, which includes a fix that limits plugin loading to the installed directory.
 
-Users are advised to upgrade to UltraVNC 1.3.8.1 to mitigate this risk. For those unable to upgrade, it is recommended to avoid installing and running the UltraVNC server as a service. Instead, users should set up a scheduled task with a low-privilege account to start WinVNC.exe. There are currently no known workarounds for scenarios where WinVNC must run as a service.
+It is recommended to upgrade to UltraVNC version 1.3.8.1 to address this vulnerability. If upgrading is not possible, it is advised not to install or run the UltraVNC server as a service. Instead, users should configure a scheduled task with a low-privilege account to start WinVNC.exe. There are no known workarounds for cases where WinVNC must run as a service.
 
-#### Affected resouces:
+#### Affected Resources:
 10.10.10.50
 
 #### Recommendation
-Upgrade to the latest version preferably version UltraVNC 1.5.0.0
+Upgrade to the latest version, ideally UltraVNC 1.5.0.0, to ensure protection against this vulnerability.
 
 ### Apache Tomcat AJP File Read/Inclusion
 | Current Rating | CVSS Score |
@@ -233,18 +235,18 @@ Allows attackers to read or include files from the server via the AJP (Apache JS
 
 **Evidence**
 
-**Ghostcat - CVE-2020-193:** This issue arises when trusting incoming AJP connections to Apache Tomcat. Tomcat treats AJP connections with higher trust compared to HTTP connections. In versions of Apache Tomcat from 9.0.0.M1 to 9.0.0.30, 8.5.0 to 8.5.50, and 7.0.0 to 7.0.99, the AJP Connector was enabled by default and listened on all configured IP addresses. It was advised (and recommended in the security guide) to disable this connector if it was not needed.
+**Ghostcat - CVE-2020-193:** This vulnerability occurs when Apache Tomcat is configured to trust AJP (Apache JServ Protocol) connections more than HTTP connections. In versions of Apache Tomcat from 9.0.0.M1 to 9.0.0.30, 8.5.0 to 8.5.50, and 7.0.0 to 7.0.99, the AJP Connector was enabled by default and accepted connections on all configured IP addresses. The security guide recommended disabling this connector if it was not necessary.
 
-The vulnerability allowed for:
-- Returning arbitrary files from anywhere within the web application.
-- Processing any file in the web application as a JSP.
+The vulnerability allowed:
+- Retrieval of arbitrary files from anywhere within the web application.
+- Execution of any file in the web application as a JSP.
 
-If the web application permitted file uploads and stored those files within the application (or if an attacker could otherwise control the web application’s content), this, combined with the ability to process files as JSPs, enabled remote code execution.
+If the web application allowed file uploads and stored these files (or if an attacker could manipulate the content of the web application), this combined with the ability to process files as JSPs, enabled remote code execution.
 
 **Mitigation Recommendations:**
-- Mitigation is essential if an AJP port is accessible to untrusted users.
-- For a defense-in-depth approach, users should upgrade to Apache Tomcat versions 9.0.31, 8.5.51, or 7.0.100 or later. These versions include hardened default configurations for the AJP Connector.
-- Users upgrading to these versions may need to adjust their configurations to align with the new default settings.
+- Ensure that an AJP port is not accessible to untrusted users to mitigate the risk.
+- For additional security, upgrade to Apache Tomcat versions 9.0.31, 8.5.51, or 7.0.100 or later. These versions have more secure default settings for the AJP Connector.
+- After upgrading, you may need to adjust your configurations to comply with the new default settings.
 
 ![msconf](Images/msconf.png)
 
