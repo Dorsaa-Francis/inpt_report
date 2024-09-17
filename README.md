@@ -100,7 +100,6 @@ This command searches for lines containing "/tcp" in the `nmap_services.txt` fil
 ![grep_tcp](Images/grep_tcp.png)
 
 
-# Vulnerabilities
 Vulnerabilities are scan using metasploit by first running metasploit console
 
 In the Metasploit console, we use the db_import command to import the results.
@@ -109,9 +108,53 @@ db_import /path/to/nmap_results.xml
 
 we now search for available auxiliary modules in Metasploit that can scan for vulnerabilities based on nmap results, we use:
 
-search type:auxiliary
-using: use auxiliary/scanner/http/http_login , we can scan for vulnerabilities
+search type:auxiliary using:
 
+use auxiliary/scanner/mysql/mysql_login,
+
+use auxiliary/scanner/vnc/vnc_login
+
+use auxiliary/scanner/rdp/rdp_login
+
+use auxiliary/scanner/smb/smb_login
+
+we can scan for vulnerabilities To use protocol-specific file created, we can use it with scanning tools in Metasploit.
+
+First we launch msfconsole;
+
+msfconsole
+msconf
+
+Then select an Auxiliary Module:
+
+For example, if you want to scan mysql services for vulnerabilities:
+
+use auxiliary/scanner/mysql/mysql_login
+mysql
+
+Set the RHOSTS Option:
+
+Point RHOSTS to the protocol-specific file:
+
+set RHOSTS file:/path/to/protocol_specific_file.txt
+RHOSTS_file
+
+Run the Scan:
+
+run
+We can develop a custom wordlist by using cewl.
+
+CeWL (Custom Word List generator) is a tool that can be used to create a custom wordlist by crawling a website. This is particularly useful for tasks such as password cracking or fuzzing where a tailored wordlist might be more effective than a generic one. Here’s how you can use CeWL to generate a custom wordlist and describe scenarios where it would be useful.
+
+To generate a wordlist using CeWL, the target URL is specified and various parameters are optionally configured to customize the output.
+
+Using the command line;
+
+cewl http://virtualinfosecafrica.com -w custom_wordlist.txt
+Once the wordlist is generated, it can be reviewed to ensure it contains the desired entries by using;
+
+cat custom_wordlist.txt
+The wordlist file will be a plain text file with one word per line.
 ![msconf](Images/msconf.png)
 
 ![searchtype](Images/searchtype.png)
